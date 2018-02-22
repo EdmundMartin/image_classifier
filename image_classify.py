@@ -61,15 +61,15 @@ class ImageClassify:
         model = tflearn.DNN(convnet, tensorboard_dir='log')
         return model
 
-    def train_model(self, model_name):
+    def train_model(self, model_name, epochs=5, batch_size=32):
         X = self.image_data
         y = self.labels
         split = int(len(X) * self.test_split)
         X_train, X_test = X[split:], X[:split]
         y_train, y_test = y[split:], y[:split]
         model = self.build_model()
-        model.fit(X_train, y_train, n_epoch=5, shuffle=True, validation_set=(X_test, y_test), show_metric=True,
-                  batch_size=32)
+        model.fit(X_train, y_train, n_epoch=epochs, shuffle=True, validation_set=(X_test, y_test), show_metric=True,
+                  batch_size=batch_size)
         model.save(model_name)
         self.model = model
 
@@ -86,3 +86,14 @@ class ImageClassify:
         most_probable_index = results.index(most_probable)
         class_name = self.classes[most_probable_index]
         return class_name, results
+
+
+if __name__ == '__main__':
+    import glob
+    images = glob.glob('*.png')
+    c = ImageClassify(['yes', 'not'], image_size=100, learning_rate=0.001)
+    c.prepare_data(images)
+    c.train_model('my_example_model')
+    c.load_model('my_example_model')
+    results = c.predict_image('road_sign.jpg')
+    print(results)
