@@ -36,11 +36,6 @@ class ImageClassify:
         for image in images:
             self._process_image(image)
 
-    def _image_to_array(self, image):
-        img = io.imread(image)
-        img = imresize(img, (self.image_size, self.image_size, 3))
-        return img
-
     def build_model(self):
         convnet = input_data(shape=[None, self.image_size, self.image_size, 3], name='input')
         convnet = conv_2d(convnet, 32, 5, activation='relu')
@@ -77,6 +72,11 @@ class ImageClassify:
         model = self.build_model()
         model.load(model_file)
         self.model = model
+
+    def _image_to_array(self, image):
+        img = io.imread(image)
+        img = imresize(img, (self.image_size, self.image_size, 3))
+        return img
 
     def predict_image(self, image):
         img = self._image_to_array(image)
